@@ -17,6 +17,9 @@ importers:
       '@strapi/strapi':
         specifier: 5.15.0
         version: 5.15.0(@babel/runtime@7.27.4)(@codemirror/autocomplete@6.18.6)(@codemirror/language@6.11.1)(@codemirror/lint@6.8.5)(@codemirror/search@6.5.11)(@codemirror/state@6.5.2)(@codemirror/theme-one-dark@6.1.2)(@codemirror/view@6.37.1)(@swc/helpers@0.5.17)(@types/hoist-non-react-statics@3.3.6)(@types/node@20.17.57)(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(codemirror@5.65.19)(esbuild@0.25.5)(koa@2.16.1)(mysql2@3.9.8)(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.30.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(redux@4.2.1)(styled-components@6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.40.0)(type-fest@4.41.0)
+      fast-xml-parser:
+        specifier: ^5.2.5
+        version: 5.2.5
       mysql2:
         specifier: 3.9.8
         version: 3.9.8
@@ -36,6 +39,9 @@ importers:
       '@biomejs/biome':
         specifier: 1.9.4
         version: 1.9.4
+      '@types/koa':
+        specifier: ^2.15.0
+        version: 2.15.0
       '@types/node':
         specifier: ^20
         version: 20.17.57
@@ -3054,6 +3060,10 @@ packages:
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==}
 
+  fast-xml-parser@5.2.5:
+    resolution: {integrity: sha512-pfX9uG9Ki0yekDHx2SiuRIyFdyAr1kMIMitPvb0YBo8SUfKvia7w7FIyd/l6av85pFYRhZscS75MwMnbvY+hcQ==}
+    hasBin: true
+
   fastq@1.19.1:
     resolution: {integrity: sha512-GwLTyxkCXjXbxqIhTsMI2Nui8huMPtnxg7krajPJAjnEG/iiOS7i+zCtWGZR9G0NBKbXKh6X9m9UIsYX/N6vvQ==}
 
@@ -5359,6 +5369,9 @@ packages:
   strip-json-comments@2.0.1:
     resolution: {integrity: sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==}
     engines: {node: '>=0.10.0'}
+
+  strnum@2.1.1:
+    resolution: {integrity: sha512-7ZvoFTiCnGxBtDqJ//Cu6fWtZtc7Y3x+QOirG15wztbdngGSkht27o2pyGWrVy0b4WAy3jbKmnoK6g5VlVNUUw==}
 
   style-loader@3.3.4:
     resolution: {integrity: sha512-0WqXzrsMTyb8yjZJHDqwmnwRJvhALK9LfRtRc6B4UTWe8AijYLZYZ9thuJTZc2VfQWINADW/j+LiJnfy2RoC1w==}
@@ -9806,6 +9819,10 @@ snapshots:
 
   fast-uri@3.0.6: {}
 
+  fast-xml-parser@5.2.5:
+    dependencies:
+      strnum: 2.1.1
+
   fastq@1.19.1:
     dependencies:
       reusify: 1.1.0
@@ -12327,6 +12344,8 @@ snapshots:
   strip-final-newline@2.0.0: {}
 
   strip-json-comments@2.0.1: {}
+
+  strnum@2.1.1: {}
 
   style-loader@3.3.4(webpack@5.99.9(esbuild@0.25.5)):
     dependencies:
