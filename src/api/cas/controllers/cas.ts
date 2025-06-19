@@ -16,7 +16,8 @@ export default factories.createCoreController('api::cas.cas', ({ strapi }) =>  (
             return;
         }
         try {
-            return await strapi.service('api::cas.cas').validateTicket(ticket, service);
+            const username = await strapi.service('api::cas.cas').validateTicket(ticket, service);
+            return strapi.plugin('users-permissions').services.jwt.issue({ username });
         } catch (err: unknown) {
             ctx.status = 502;
             ctx.body = {
