@@ -1,14 +1,12 @@
+import { factories } from '@strapi/strapi';
 import type { Context } from 'koa';
-
-import { TicketValidator } from '..';
 import { routes } from '../routes/cas';
 
-const serviceUrl = `${process.env.URL}/api${routes.callback.path}`;
-const ticketValidator = new TicketValidator(process.env.CAS_URL, serviceUrl);
+const service = `${process.env.URL}/api${routes.callback.path}`;
 
-export default {
+export default factories.createCoreController('api::cas.cas', ({ strapi }) =>  ({
     async login(ctx: Context) {
-        ctx.redirect(`${process.env.CAS_URL}/login?service=${encodeURIComponent(serviceUrl)}`);
+        ctx.redirect(`${process.env.CAS_URL}/login?service=${encodeURIComponent(service)}`);
     },
     async callback(ctx: Context) {
         const { ticket } = ctx.query as { ticket?: string };
@@ -18,7 +16,7 @@ export default {
             return;
         }
         try {
-            return await ticketValidator.validate(ticket);
+            return await strapi.service('api::cas.cas').validateTicket(ticket, service);
         } catch (err: unknown) {
             ctx.status = 502;
             ctx.body = {
