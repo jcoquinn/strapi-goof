@@ -1,10 +1,9 @@
-import { factories } from '@strapi/strapi';
 import type { Context } from 'koa';
 import { routes } from '../routes/cas';
 
 const service = `${process.env.URL}/api${routes.callback.path}`;
 
-export default factories.createCoreController('api::cas.cas', ({ strapi }) =>  ({
+export default ({ strapi }) => ({
     async login(ctx: Context) {
         ctx.redirect(`${process.env.CAS_URL}/login?service=${encodeURIComponent(service)}`);
     },
@@ -26,4 +25,4 @@ export default factories.createCoreController('api::cas.cas', ({ strapi }) =>  (
             };
         }
     },
-};
+});

@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "agencies",
+  "info": {
+    "singularName": "agency",
+    "pluralName": "agencies",
+    "displayName": "Agency"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Name": {
+      "type": "string"
+    },
+    "Description": {
+      "type": "text"
+    },
+    "agency_addresses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::agency-address.agency-address"
+    },
+    "agency_contacts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::agency-contact.agency-contact"
+    }
+  }
+}

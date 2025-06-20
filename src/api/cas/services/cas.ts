@@ -2,7 +2,6 @@
  * cas service
  */
 
-import { factories } from '@strapi/strapi';
 import { XMLParser } from 'fast-xml-parser';
 
 type username = string;
@@ -60,8 +59,8 @@ class TicketValidator {
 
 const tv = new TicketValidator(process.env.CAS_URL);
 
-export default factories.createCoreService('api::cas.cas', ({ strapi }) => ({
+export default ({ strapi }) => ({
     async validateTicket(ticket: string, service: string): Promise<string> {
         return tv.validate(ticket, service);
     },
-}));
+});

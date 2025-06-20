@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "agency_contacts",
+  "info": {
+    "singularName": "agency-contact",
+    "pluralName": "agency-contacts",
+    "displayName": "Agency Contact"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Description": {
+      "type": "string"
+    },
+    "FullName": {
+      "type": "string"
+    },
+    "Email": {
+      "type": "email"
+    },
+    "Phone": {
+      "type": "string"
+    }
+  }
+}
