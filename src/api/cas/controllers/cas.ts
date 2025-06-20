@@ -1,4 +1,5 @@
 import type { Context } from 'koa';
+import crypto from 'node:crypto';
 import { routes } from '../routes/cas';
 
 const service = `${process.env.URL}/api${routes.callback.path}`;
@@ -15,12 +16,35 @@ export default ({ strapi }) => ({
             return;
         }
         try {
-            const username = await strapi.service('api::cas.cas').validateTicket(ticket, service);
-            return strapi.plugin('users-permissions').services.jwt.issue({ username });
+            const attrs = await strapi.service('api::cas.cas').validateTicket(ticket, service);
+            const user = await strapi.db
+                .query('plugin::users-permissions.user')
+                .findOne({ where: { username: attrs.username } });
+            if (user) {
+                ctx.params.id = user.id;
+                ctx.request.body = {
+                    email: attrs.email,
+                };
+                await strapi.controller('plugin::users-permissions.user').update(ctx);
+                ctx.body = {
+                    jwt: strapi.plugin('users-permissions').services.jwt.issue({ id: user.id }),
+                    user: await strapi.contentAPI.sanitize.output(
+                        user,
+                        strapi.getModel('plugin::users-permissions.user'),
+                        { auth: ctx.state.auth },
+                    ),
+                };
+                return;
+            }
+            ctx.request.body = {
+                ...attrs,
+                password: crypto.randomBytes(32).toString('hex'),
+            };
+            return await strapi.controller('plugin::users-permissions.auth').register(ctx);
         } catch (err: unknown) {
             ctx.status = 502;
             ctx.body = {
-                error: 'CAS: failed validating ticket',
+                error: 'CAS: controller callback failed',
                 details: err instanceof Error ? err.message : String(err),
             };
         }

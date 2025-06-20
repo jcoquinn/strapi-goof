@@ -4,7 +4,10 @@
 
 import { XMLParser } from 'fast-xml-parser';
 
-type username = string;
+type Attrs = {
+    username: string;
+    email: string;
+};
 
 class TicketValidator {
     private url: string;
@@ -16,7 +19,7 @@ class TicketValidator {
         this.parser = new XMLParser();
     }
 
-    async validate(ticket: string, service: string): Promise<username> {
+    async validate(ticket: string, service: string): Promise<Attrs> {
         const xml = await this.validateTicket(ticket, service);
         return this.handleResponse(xml);
     }
@@ -33,18 +36,23 @@ class TicketValidator {
         return await resp.text();
     }
 
-    private handleResponse(xml: string): username {
+    private handleResponse(xml: string): Attrs {
         const data = this.parser.parse(xml);
         const root = data['cas:serviceResponse'];
         const success = root['cas:authenticationSuccess'];
         const failure = root['cas:authenticationFailure'];
 
         if (success) {
-            const username = success['cas:user'] || null;
+            const username = success['cas:user'];
             if (!username) {
                 throw this.newError('authenticationSuccess missing username');
             }
-            return username;
+            const attrs = success['cas:attributes'] || {};
+            const email = attrs['cas:mail'] || attrs['cas:email'];
+            if (!email) {
+                throw this.newError('cas:attributes missing mail or email');
+            }
+            return { username, email } as Attrs;
         }
         if (failure) {
             throw this.newError(failure['#text'] || 'ticket validation failed');
@@ -60,7 +68,7 @@ class TicketValidator {
 const tv = new TicketValidator(process.env.CAS_URL);
 
 export default ({ strapi }) => ({
-    async validateTicket(ticket: string, service: string): Promise<string> {
+    async validateTicket(ticket: string, service: string): Promise<Attrs> {
         return tv.validate(ticket, service);
     },
 });
