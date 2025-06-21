@@ -40,5 +40,14 @@
   "strapi": {
     "uuid": "0a795809-4bce-4e27-a009-4e168b87ae72",
     "installId": "326bb40cbb334b1f4e99c5c7579ec0a21e2c5e8d625a24e62a2243071ca8da9c"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@biomejs/biome",
+      "@swc/core",
+      "core-js-pure",
+      "esbuild",
+      "sharp"
+    ]
   }
 }
