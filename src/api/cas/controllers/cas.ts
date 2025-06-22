@@ -1,5 +1,4 @@
 import type { Context } from 'koa';
-import crypto from 'node:crypto';
 import { routes } from '../routes/cas';
 
 const service = `${process.env.URL}/api${routes.callback.path}`;
@@ -15,38 +14,44 @@ export default ({ strapi }) => ({
             ctx.body = { error: 'CAS: missing ticket query param' };
             return;
         }
-        try {
-            const attrs = await strapi.service('api::cas.cas').validateTicket(ticket, service);
-            const user = await strapi.db
-                .query('plugin::users-permissions.user')
-                .findOne({ where: { username: attrs.username } });
-            if (user) {
-                ctx.params.id = user.id;
-                ctx.request.body = {
-                    email: attrs.email,
-                };
-                await strapi.controller('plugin::users-permissions.user').update(ctx);
-                ctx.body = {
-                    jwt: strapi.plugin('users-permissions').services.jwt.issue({ id: user.id }),
-                    user: await strapi.contentAPI.sanitize.output(
-                        user,
-                        strapi.getModel('plugin::users-permissions.user'),
-                        { auth: ctx.state.auth },
-                    ),
-                };
-                return;
-            }
-            ctx.request.body = {
-                ...attrs,
-                password: crypto.randomBytes(32).toString('hex'),
-            };
-            return await strapi.controller('plugin::users-permissions.auth').register(ctx);
-        } catch (err: unknown) {
-            ctx.status = 502;
+        const attrs = await strapi.service('api::cas.cas').validateTicket(ticket, service);
+        let user = await strapi.db
+            .query('plugin::users-permissions.user')
+            .findOne({ where: { username: attrs.username } });
+        if (user) {
+            user = await strapi
+                .service('plugin::users-permissions.user')
+                .edit(user.id, { email: attrs.email, provider: 'GS' });
             ctx.body = {
-                error: 'CAS: controller callback failed',
-                details: err instanceof Error ? err.message : String(err),
+                jwt: await strapi.service('plugin::users-permissions.jwt').issue({ id: user.id }),
+                user: await strapi.contentAPI.sanitize.output(
+                    user,
+                    strapi.getModel('plugin::users-permissions.user'),
+                    { auth: ctx.state.auth },
+                ),
             };
+            return;
         }
+        const settings = await strapi
+            .store({ type: 'plugin', name: 'users-permissions', key: 'advanced' })
+            .get();
+        const role = await strapi.db
+            .query('plugin::users-permissions.role')
+            .findOne({ where: { type: settings.default_role } });
+        user = await strapi.service('plugin::users-permissions.user').add({
+            username: attrs.username,
+            email: attrs.email,
+            provider: 'GS',
+            role: role.id,
+            confirmed: true,
+        });
+        ctx.body = {
+            jwt: await strapi.service('plugin::users-permissions.jwt').issue({ id: user.id }),
+            user: await strapi.contentAPI.sanitize.output(
+                user,
+                strapi.getModel('plugin::users-permissions.user'),
+                { auth: ctx.state.auth },
+            ),
+        };
     },
 });
